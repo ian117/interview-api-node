@@ -4,6 +4,10 @@ import * as Joi from 'joi';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { SequelizeModule } from '@nestjs/sequelize';
+import { ConfigSequelize } from './database/config';
+
+const configSequelize = ConfigSequelize.get();
 
 @Module({
   imports: [
@@ -34,6 +38,14 @@ import { AppService } from './app.service';
         SECRET_TOKEN: Joi.string().required(),
         DOCS_PASSWORD: Joi.string().required(),
       }),
+    }),
+    SequelizeModule.forRoot({
+      ...configSequelize[process.env.NODE_ENV],
+      uri: process.env[
+        configSequelize[process.env.NODE_ENV]['use_env_variable']
+      ],
+      autoLoadModels: true,
+      synchronize: false,
     }),
   ],
   controllers: [AppController],
