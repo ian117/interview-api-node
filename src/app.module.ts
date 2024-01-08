@@ -5,9 +5,8 @@ import * as Joi from 'joi';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { ConfigSequelize } from './database/config';
 
-const configSequelize = ConfigSequelize.get();
+import * as configSequelize from './database/config';
 
 @Module({
   imports: [

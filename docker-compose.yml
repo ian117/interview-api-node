@@ -1,0 +1,40 @@
+version: "3.7"
+
+name: finware_interview_ian_v
+
+services:
+
+  api:
+    build: .
+    image: api_image
+    container_name: api_container
+    ports:
+      - "${PORT}:${PORT}"
+    restart: always
+    depends_on:
+      - api_pg_db
+    networks:
+      - api_network
+    env_file:
+      - .env
+
+
+  api_pg_db:
+    image: postgres:14.8-alpine
+    container_name: api_pg_db_container
+    ports:
+      - "7033:5432"
+    env_file:
+      - .env.db.docker
+    volumes:
+      - pg_volume:/var/lib/postgresql/data
+    networks:
+      api_network:
+
+volumes:
+  pg_volume:
+    name: api_pg_volume
+
+networks:
+  api_network:
+    name: api_network
