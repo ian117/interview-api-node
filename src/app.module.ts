@@ -6,7 +6,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { SequelizeModule } from '@nestjs/sequelize';
 
-import * as configSequelize from './database/config';
+import * as configSequelize from '../src/database/config';
 
 @Module({
   imports: [
