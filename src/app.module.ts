@@ -5,6 +5,9 @@ import * as Joi from 'joi';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { SequelizeModule } from '@nestjs/sequelize';
+import { AuthModule } from './auth/auth.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { CoreModule } from './core/core.module';
 
 import * as configSequelize from '../src/database/config';
 
@@ -46,6 +49,9 @@ import * as configSequelize from '../src/database/config';
       autoLoadModels: true,
       synchronize: false,
     }),
+    AuthModule,
+    CoreModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
