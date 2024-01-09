@@ -1,14 +1,15 @@
 import {
   ConflictException,
   Injectable,
-  InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Sequelize } from 'sequelize-typescript';
-import bcrypt from 'bcryptjs';
+import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcryptjs';
 
 import { Users } from '../core/models/users.model';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
@@ -16,20 +17,61 @@ export class AuthService {
     @InjectModel(Users)
     private readonly userModel: typeof Users,
     private readonly sequelize: Sequelize,
+    private jwtService: JwtService,
+    private readonly configServicre: ConfigService,
   ) {}
 
   async login(email: string, password: string): Promise<Users> {
     const user = await this.findUserOr401(email);
 
-    const correctCredentials = this.comparePassword(password, user.password);
-
-    if (!correctCredentials) {
-      throw new UnauthorizedException(`Credentials Don't Match`);
-    }
+    const correctCredentials = this.comparePasswordOr401(
+      password,
+      user.password,
+    );
 
     delete user.password;
     return user;
   }
+
+  async userInfoAuth(id): Promise<Users> {
+    const user = await this.findUserByIdOr401(id);
+    delete user.password;
+    return user;
+  }
+
+  makeUserPayloadJWT(userObject: Users): string {
+    const payload = {
+      first_name: userObject.first_name,
+      last_name: userObject.first_name,
+      sub: userObject.id, // standarts with other libraries... but i leave it just because
+      id: userObject.id,
+      email: userObject.email,
+    };
+
+    return this.jwtService.sign(payload);
+  }
+
+  async signUp(userObject): Promise<Users> {
+    await this.ifUserExistbyEmailThrow409(userObject.email);
+
+    const transaction = await this.sequelize.transaction();
+    let user;
+    try {
+      userObject.password = this.hashPassword(userObject.password);
+      user = await this.userModel.create(userObject, { transaction });
+
+      //TODO Create 1 wallet
+
+      await transaction.commit();
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
+    }
+
+    return user;
+  }
+
+  /* Private Methods */
 
   private async findUserOr401(email): Promise<Users> {
     const user = await this.userModel.findOne({
@@ -44,25 +86,24 @@ export class AuthService {
     return user;
   }
 
-  private comparePassword(passwordProvided, passwordHashed): boolean {
-    return bcrypt.compareSync(passwordProvided, passwordHashed);
-  }
+  private async findUserByIdOr401(id): Promise<Users> {
+    const user = await this.userModel.findOne({
+      where: { id },
+      attributes: ['id', 'email', 'password', 'first_name', 'last_name'],
+    });
 
-  async signUp(userObject): Promise<Users> {
-    await this.ifUserExistbyEmailThrow409(userObject.email);
-
-    const transaction = await this.sequelize.transaction();
-    let user;
-    try {
-      userObject.password = this.hashPassword(userObject.password);
-      user = await this.userModel.create(userObject, { transaction });
-      await transaction.commit();
-    } catch (error) {
-      await transaction.rollback();
-      throw error;
+    if (!user) {
+      throw new UnauthorizedException(`User doesn't exist`);
     }
 
     return user;
+  }
+
+  private comparePasswordOr401(passwordProvided, passwordHashed): void {
+    const passwordPassed = bcrypt.compareSync(passwordProvided, passwordHashed);
+    if (!passwordPassed) {
+      throw new UnauthorizedException(`Credentials Don't Match`);
+    }
   }
 
   private async ifUserExistbyEmailThrow409(email): Promise<void> {
@@ -76,6 +117,7 @@ export class AuthService {
   }
 
   private hashPassword(password): string {
-    return bcrypt.hashSync(password, 10);
+    const hashedPassword = bcrypt.hashSync(password, 10);
+    return hashedPassword;
   }
 }

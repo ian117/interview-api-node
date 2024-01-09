@@ -7,8 +7,18 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  login(@Body() loginDTO) {}
+  async login(@Body() loginDTO) {
+    const user = await this.authService.login(
+      loginDTO.email,
+      loginDTO.password,
+    );
+
+    const access_token = this.authService.makeUserPayloadJWT(user);
+    return { access_token };
+  }
 
   @Post('signup')
-  signup(@Body() signupDTO) {}
+  async signup(@Body() signupDTO): Promise<void> {
+    const user = await this.authService.signUp(signupDTO);
+  }
 }
