@@ -6,6 +6,11 @@ import { Wallets } from './models/wallets.model';
 import { Opportunities } from './models/opportunities.model';
 import { UsersOpportunitiesPivot } from './models/users-opportunities.model';
 
+import { UsersController } from './controllers/users.controller';
+import { OpportunitiesController } from './controllers/opportunities.controller';
+
+import { CoreService } from './core.service';
+
 @Module({
   imports: [
     SequelizeModule.forFeature([
@@ -15,5 +20,8 @@ import { UsersOpportunitiesPivot } from './models/users-opportunities.model';
       UsersOpportunitiesPivot,
     ]),
   ],
+  exports: [SequelizeModule],
+  controllers: [UsersController, OpportunitiesController],
+  providers: [CoreService],
 })
 export class CoreModule {}
