@@ -9,10 +9,12 @@ import {
   UpdatedAt,
   HasOne,
   BelongsToMany,
+  AllowNull,
 } from 'sequelize-typescript';
-import { Opportunity } from './opportunities.model';
-import { UsersOpportunitiesPivot } from './users-opportunities.model';
-import { Wallet } from './wallet.model';
+
+import { Opportunities } from 'src/core/models/opportunities.model';
+import { UsersOpportunitiesPivot } from 'src/core/models/users-opportunities.model';
+import { Wallets } from 'src/core/models/wallets.model';
 
 @Table({
   tableName: 'users',
@@ -29,22 +31,29 @@ export class Users extends Model<Users> {
   id: string;
 
   @Unique
+  @AllowNull(false)
   @Column(DataType.STRING(254))
   email: string;
 
+  @AllowNull(false)
   @Column(DataType.STRING(254))
   password: string;
+
+  @AllowNull(false)
   @Column(DataType.STRING(254))
   first_name: string;
 
+  @AllowNull(false)
   @Column(DataType.STRING(254))
   last_name: string;
 
+  @AllowNull(false)
   @Column(DataType.STRING(254))
   address: string;
 
-  @Column(DataType.STRING(254))
-  birthdate: string;
+  @AllowNull(false)
+  @Column(DataType.DATE)
+  birthdate: Date;
 
   @CreatedAt
   @Column(DataType.DATE)
@@ -56,9 +65,9 @@ export class Users extends Model<Users> {
 
   /* Associations */
 
-  @BelongsToMany(() => Opportunity, () => UsersOpportunitiesPivot, 'user_id')
-  investments: Opportunity[];
+  @BelongsToMany(() => Opportunities, () => UsersOpportunitiesPivot, 'user_id')
+  investments: Opportunities[];
 
-  @HasOne(() => Wallet, 'user_id')
-  wallet: Wallet;
+  @HasOne(() => Wallets, 'user_id')
+  wallet: Wallets;
 }

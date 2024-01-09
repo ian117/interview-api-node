@@ -9,22 +9,24 @@ import {
   UpdatedAt,
   ForeignKey,
   BelongsTo,
+  AllowNull,
 } from 'sequelize-typescript';
 
-import { Users } from './users.model';
+import { Users } from 'src/core/models/users.model';
 
 @Table({
-  tableName: 'wallet',
-  modelName: 'Wallet',
+  tableName: 'wallets',
+  modelName: 'Wallets',
   underscored: true,
   timestamps: true,
 })
-export class Wallet extends Model<Wallet> {
+export class Wallets extends Model<Wallets> {
   @PrimaryKey
   @ForeignKey(() => Users)
   @Column(DataType.UUID)
   user_id: string;
 
+  @AllowNull(false)
   @Column(DataType.DECIMAL)
   balance: number;
 
@@ -38,6 +40,6 @@ export class Wallet extends Model<Wallet> {
 
   /* Associations */
 
-  @BelongsTo(() => Users)
+  @BelongsTo(() => Users, 'user_id')
   user: Users;
 }

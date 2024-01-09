@@ -4,16 +4,15 @@ import {
   Model,
   PrimaryKey,
   Table,
-  Unique,
   CreatedAt,
   UpdatedAt,
   DeletedAt,
   ForeignKey,
-  HasMany,
   BelongsTo,
 } from 'sequelize-typescript';
-import { Users } from './users.model';
-import { Opportunity } from './Opportunities.model';
+
+import { Users } from 'src/core/models/users.model';
+import { Opportunities } from 'src/core/models/opportunities.model';
 
 @Table({
   tableName: 'users_opportunities',
@@ -28,11 +27,11 @@ export class UsersOpportunitiesPivot extends Model<UsersOpportunitiesPivot> {
   user_id: string;
 
   @PrimaryKey
-  @ForeignKey(() => Opportunity)
+  @ForeignKey(() => Opportunities)
   @Column(DataType.UUID)
   opportunity_id: string;
 
-  @Column(DataType.DECIMAL())
+  @Column(DataType.DECIMAL)
   investment_amount: number;
 
   @CreatedAt
@@ -49,9 +48,9 @@ export class UsersOpportunitiesPivot extends Model<UsersOpportunitiesPivot> {
 
   /* Associations */
 
-  @BelongsTo(() => Users)
+  @BelongsTo(() => Users, 'user_id')
   user: Users;
 
-  @BelongsTo(() => Opportunity)
-  opportunity: Opportunity;
+  @BelongsTo(() => Opportunities, 'opportunity_id')
+  opportunity: Opportunities;
 }

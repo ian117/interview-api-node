@@ -10,17 +10,19 @@ import {
   DeletedAt,
   HasMany,
   BelongsToMany,
+  AllowNull,
 } from 'sequelize-typescript';
-import { Users } from './users.model';
-import { UsersOpportunitiesPivot } from './users-opportunities.model';
+
+import { Users } from 'src/core/models/users.model';
+import { UsersOpportunitiesPivot } from 'src/core/models/users-opportunities.model';
 
 @Table({
-  tableName: 'opportunity',
-  modelName: 'Opportunity',
+  tableName: 'opportunities',
+  modelName: 'Opportunities',
   underscored: true,
   timestamps: true,
 })
-export class Opportunity extends Model<Opportunity> {
+export class Opportunities extends Model<Opportunities> {
   @PrimaryKey
   @Column({
     type: DataType.UUID,
@@ -29,10 +31,12 @@ export class Opportunity extends Model<Opportunity> {
   id: string;
 
   @Unique
+  @AllowNull(false)
   @Column(DataType.STRING(254))
   title: string;
 
-  @Column(DataType.DECIMAL())
+  @AllowNull(false)
+  @Column(DataType.DECIMAL)
   total_amount: number;
 
   @CreatedAt
@@ -50,5 +54,5 @@ export class Opportunity extends Model<Opportunity> {
   /* Associations */
 
   @BelongsToMany(() => Users, () => UsersOpportunitiesPivot, 'opportunity_id')
-  Users: Users[];
+  users: Users[];
 }
