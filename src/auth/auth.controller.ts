@@ -1,5 +1,6 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { LoginDTO, SignUpDTO } from './dtos/auth.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -7,10 +8,10 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  async login(@Body() loginDTO) {
+  async login(@Body() loginDto: LoginDTO) {
     const user = await this.authService.login(
-      loginDTO.email,
-      loginDTO.password,
+      loginDto.email,
+      loginDto.password,
     );
 
     const access_token = this.authService.makeUserPayloadJWT(user);
@@ -18,7 +19,7 @@ export class AuthController {
   }
 
   @Post('signup')
-  async signup(@Body() signupDTO): Promise<void> {
+  async signup(@Body() signupDTO: SignUpDTO): Promise<void> {
     const user = await this.authService.signUp(signupDTO);
   }
 }
