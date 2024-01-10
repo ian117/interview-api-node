@@ -1,14 +1,35 @@
+import { IsEmpty, IsInt, IsOptional, IsPositive } from 'class-validator';
+// import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsOptional, IsPositive } from 'class-validator';
 
 export class PaginationQueryDTO {
+  //   @ApiProperty({
+  //     type: Number,
+  //     description:
+  //       'Number of page in the pagination. 0 and 1 are the same. It goes 1, then 2, then 3',
+  //     example: '1',
+  //   })
   @Type(() => Number)
-  @IsOptional()
+  @IsInt()
   @IsPositive()
-  limit: number;
+  @IsOptional()
+  page: number;
 
+  //   @ApiProperty({
+  //     type: Number,
+  //     description:
+  //       'Max number of results per page. The default size is 10, but this behaviour can be replace it it any endpoint that requires it.',
+  //     example: '1',
+  //   })
   @Type(() => Number)
-  @IsOptional()
+  @IsInt()
   @IsPositive()
+  @IsOptional()
+  size: number;
+
+  // This 2 are empty, just are here for SugarSyntax in next part
+  @IsEmpty()
+  limit: number;
+  @IsEmpty()
   offset: number;
 }
