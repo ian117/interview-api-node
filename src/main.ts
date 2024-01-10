@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -16,6 +17,24 @@ async function bootstrap() {
         process.env.NODE_ENV == 'production' ? false : false,
     }),
   );
+
+  const options = new DocumentBuilder()
+    .setTitle('Inversion Opportunities API')
+    .setDescription('All the possible operations are here')
+    .setVersion('1.0')
+    .addTag('API Endpoints')
+    .addBearerAuth(
+      {
+        description: 'JWT Authorization',
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+      },
+      'JWT Token',
+    )
+    .build();
+  const document = SwaggerModule.createDocument(app, options);
+  SwaggerModule.setup('docs', app, document);
 
   await app.listen(process.env.PORT || 3000);
 }
