@@ -4,10 +4,12 @@ import {
   Get,
   Header,
   Post,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { PaginationQueryDTO } from '../dtos/pagination.dto';
 
 @Controller('users')
 export class UsersController {
@@ -18,7 +20,7 @@ export class UsersController {
   }
 
   @Get('me/investments')
-  myInvestments() {}
+  myInvestments(@Query() paginationQueryDto: PaginationQueryDTO) {}
 
   @Post('/balance')
   addBalance() {}
