@@ -17,7 +17,10 @@ import { PaginationQueryDTO } from '../dtos/pagination.dto';
 import { getPagination, getPagingData } from '../helpers/paginations';
 import { requestUser } from 'src/common/interfaces/common.interface';
 import { AuthGuard } from '@nestjs/passport';
-import { opportunityParamsDTO } from '../dtos/opportunities.dto';
+import {
+  createOpportunityDTO,
+  opportunityParamsDTO,
+} from '../dtos/opportunities.dto';
 
 @ApiTags('Opportunities')
 @Controller('opportunities')
@@ -53,7 +56,7 @@ export class OpportunitiesController {
 
   @UseGuards(AuthGuard('custom-admin-token'))
   @Post('admin/')
-  async create(@Body() opportunityObject) {
+  async create(@Body() opportunityObject: createOpportunityDTO) {
     return await this.opportunitiesService.addOne(opportunityObject);
   }
 
