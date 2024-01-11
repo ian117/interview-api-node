@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsNotEmpty,
@@ -10,7 +10,7 @@ import {
   MaxLength,
 } from 'class-validator';
 
-export class opportunityParamsDTO {
+export class OpportunityParamsDTO {
   @ApiProperty({
     example: 'fd914b72-a423-4256-99a1-aff78da9281f',
     description: `ID of the Opportunity`,
@@ -20,7 +20,7 @@ export class opportunityParamsDTO {
   readonly id: string;
 }
 
-export class createOpportunityDTO {
+export class CreateOpportunityDTO {
   @ApiProperty({
     example: 'X (Formerly Twitter)',
     description: `Name of the opportunity`,
@@ -39,3 +39,6 @@ export class createOpportunityDTO {
   @IsPositive()
   readonly total_amount: string;
 }
+
+// ALL Keys in CreateDTO now are optionall
+export class UpdateOpportunityDto extends PartialType(CreateOpportunityDTO) {}

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Users } from '../models/users.model';
 import { Opportunities } from '../models/opportunities.model';
@@ -121,6 +125,8 @@ export class OpportunitiesService {
   }
 
   async addOne(opportunityObject) {
+    await this.ifExistByNameThrow409(opportunityObject.title);
+
     const transaction = await this.sequelize.transaction();
     try {
       const opportunity = await this.opportunityModel.create(
@@ -142,6 +148,10 @@ export class OpportunitiesService {
   async updateOne(opportunityId, opportunityObject) {
     const opportunity = await this.findOneOr404(opportunityId);
 
+    if (opportunityObject.title) {
+      await this.ifExistByNameThrow409(opportunityObject.title);
+    }
+
     const transaction = await this.sequelize.transaction();
     try {
       const editedOpportunity = await opportunity.update(opportunityObject, {
@@ -160,13 +170,13 @@ export class OpportunitiesService {
   async deleteOne(opportunityId) {
     const opportunity = await this.findOneOr404(opportunityId);
 
+    // TODO if user-opportunities exist -> throw 409
+
     const transaction = await this.sequelize.transaction();
     try {
       const removedOpportunity = await opportunity.destroy({ transaction });
 
       await transaction.commit();
-
-      // TODO delete the user-opportunities too
 
       return removedOpportunity;
     } catch (error) {
@@ -180,5 +190,15 @@ export class OpportunitiesService {
     if (!opportunity)
       throw new NotFoundException('Not found Inversion Opportunity');
     return opportunity;
+  }
+
+  private async ifExistByNameThrow409(title) {
+    const opportunity = await this.opportunityModel.findOne({
+      where: { title },
+    });
+    if (opportunity)
+      throw new ConflictException(
+        'An Inversion Opportunity already have that name',
+      );
   }
 }
