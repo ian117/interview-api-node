@@ -47,10 +47,6 @@ export class Opportunities extends Model<Opportunities> {
   @Column(DataType.DATE)
   updated_at: Date;
 
-  @DeletedAt
-  @Column(DataType.DATE)
-  deleted_at: Date;
-
   /* Associations */
 
   @BelongsToMany(() => Users, () => UsersOpportunitiesPivot, 'opportunity_id')

@@ -32,10 +32,6 @@ module.exports = {
             type: Sequelize.DATE,
             field: 'updated_at',
           },
-          deleted_at: {
-            type: Sequelize.DATE,
-            field: 'deleted_at',
-          },
         },
         { transaction },
       );
