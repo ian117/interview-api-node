@@ -38,6 +38,7 @@ import * as configSequelize from '../src/database/config';
           otherwise: Joi.optional(),
         }),
         SECRET_TOKEN: Joi.string().required(),
+        SECRET_ADMIN_TOKEN: Joi.string().required(),
         DOCS_PASSWORD: Joi.string().required(),
       }),
     }),
