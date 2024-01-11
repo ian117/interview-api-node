@@ -30,7 +30,7 @@ export class UsersService {
     return user;
   }
 
-  async userBalances(
+  async findAndCountuserBalances(
     id: string,
     query,
   ): Promise<{ rows: Opportunities[]; count: number }> {

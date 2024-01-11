@@ -45,7 +45,7 @@ export class UsersController {
     const { limit, offset } = getPagination(page, size);
     query.limit = limit;
     query.offset = offset;
-    const opportunities = await this.usersService.userBalances(
+    const opportunities = await this.usersService.findAndCountuserBalances(
       request.user.id,
       query,
     );
