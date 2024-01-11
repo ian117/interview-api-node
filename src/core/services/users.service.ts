@@ -51,7 +51,7 @@ export class UsersService {
     options.include = [
       {
         model: Users,
-        required: false,
+        required: true,
         where: { id },
       },
     ];
