@@ -10,6 +10,7 @@ import { UsersController } from './controllers/users.controller';
 import { OpportunitiesController } from './controllers/opportunities.controller';
 
 import { CoreService } from './core.service';
+import { UsersService } from './services/users.service';
 
 @Module({
   imports: [
@@ -22,6 +23,6 @@ import { CoreService } from './core.service';
   ],
   exports: [SequelizeModule],
   controllers: [UsersController, OpportunitiesController],
-  providers: [CoreService],
+  providers: [CoreService, UsersService],
 })
 export class CoreModule {}

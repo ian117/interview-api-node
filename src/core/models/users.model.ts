@@ -21,6 +21,11 @@ import { Wallets } from 'src/core/models/wallets.model';
   modelName: 'Users',
   underscored: true,
   timestamps: true,
+  scopes: {
+    me_view: {
+      attributes: { exclude: ['password'] },
+    },
+  },
 })
 export class Users extends Model<Users> {
   @PrimaryKey

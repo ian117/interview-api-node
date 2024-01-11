@@ -10,12 +10,15 @@ import * as bcrypt from 'bcryptjs';
 
 import { Users } from '../core/models/users.model';
 import { ConfigService } from '@nestjs/config';
+import { Wallets } from 'src/core/models/wallets.model';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectModel(Users)
     private readonly userModel: typeof Users,
+    @InjectModel(Wallets)
+    private readonly walletModel: typeof Wallets,
     private readonly sequelize: Sequelize,
     private jwtService: JwtService,
     private readonly configServicre: ConfigService,
@@ -60,7 +63,13 @@ export class AuthService {
       userObject.password = this.hashPassword(userObject.password);
       user = await this.userModel.create(userObject, { transaction });
 
-      //TODO Create 1 wallet
+      const wallet = await this.walletModel.create(
+        {
+          user_id: user.id,
+          balance: 1000,
+        },
+        { transaction },
+      );
 
       await transaction.commit();
     } catch (error) {
