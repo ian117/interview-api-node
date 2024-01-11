@@ -1,7 +1,9 @@
 import {
+  Body,
   Controller,
   Delete,
   Get,
+  Param,
   Post,
   Put,
   Query,
@@ -15,6 +17,7 @@ import { PaginationQueryDTO } from '../dtos/pagination.dto';
 import { getPagination, getPagingData } from '../helpers/paginations';
 import { requestUser } from 'src/common/interfaces/common.interface';
 import { AuthGuard } from '@nestjs/passport';
+import { opportunityParamsDTO } from '../dtos/opportunities.dto';
 
 @ApiTags('Opportunities')
 @Controller('opportunities')
@@ -50,27 +53,33 @@ export class OpportunitiesController {
 
   @UseGuards(AuthGuard('custom-admin-token'))
   @Post('admin/')
-  create() {}
+  async create(@Body() opportunityObject) {
+    return await this.opportunitiesService.addOne(opportunityObject);
+  }
 
   @UseGuards(AuthGuard('custom-admin-token'))
   @Put('admin/:id')
-  edit() {}
+  async edit(@Param() { id }: opportunityParamsDTO, @Body() opportunityObject) {
+    return await this.opportunitiesService.updateOne(id, opportunityObject);
+  }
 
   @UseGuards(AuthGuard('custom-admin-token'))
   @Delete('admin/:id')
-  remove() {}
+  async remove(@Param() { id }: opportunityParamsDTO) {
+    return await this.opportunitiesService.deleteOne(id);
+  }
 
   @UseGuards(AuthGuard(['jwt-token', 'custom-admin-token']))
   @Get(':id')
-  getOne() {
-    return { message: 'hi' };
+  async getOne(@Param() { id }: opportunityParamsDTO) {
+    return await this.opportunitiesService.findOneOr404(id);
   }
 
   @UseGuards(AuthGuard('jwt-token'))
   @Post('investment')
-  addInvestment() {}
+  async addInvestment() {}
 
   @UseGuards(AuthGuard('jwt-token'))
   @Delete('investment')
-  removeInvestment() {}
+  async removeInvestment() {}
 }
