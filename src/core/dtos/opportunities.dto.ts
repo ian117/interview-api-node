@@ -13,7 +13,7 @@ import {
 export class OpportunityParamsDTO {
   @ApiProperty({
     example: 'fd914b72-a423-4256-99a1-aff78da9281f',
-    description: `ID of the Opportunity`,
+    description: `ID of the Inversion Opportunity`,
     required: true,
   })
   @IsUUID('4')
@@ -23,7 +23,7 @@ export class OpportunityParamsDTO {
 export class CreateOpportunityDTO {
   @ApiProperty({
     example: 'X (Formerly Twitter)',
-    description: `Name of the opportunity`,
+    description: `Name of the Inversion Opportunity`,
     required: true,
   })
   @IsString()
@@ -31,6 +31,11 @@ export class CreateOpportunityDTO {
   @IsNotEmpty()
   readonly title: string;
 
+  @ApiProperty({
+    example: 10000,
+    description: `Max total amount of the Inversion Opportunity`,
+    required: true,
+  })
   @Type(() => Number)
   @IsNumber()
   @Max(100000000, {
