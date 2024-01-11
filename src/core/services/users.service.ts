@@ -44,8 +44,6 @@ export class UsersService {
       options.offset = offset;
     }
 
-    options.paranoid = false;
-
     options.distinct = true;
 
     options.include = [
