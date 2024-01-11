@@ -70,60 +70,6 @@ export class OpportunitiesService {
     return this.opportunityModel.findAndCountAll(options);
   }
 
-  async findAndCountByAdmin(
-    query: any,
-  ): Promise<{ rows: Opportunities[]; count: number }> {
-    const options: any = {
-      where: {},
-    };
-
-    const { limit, offset } = query;
-    if (limit && offset) {
-      options.limit = limit;
-      options.offset = offset;
-    }
-
-    const { id } = query;
-    if (id) {
-      options.where.id = { [Op.iLike]: `%${id}%` };
-    }
-
-    const { title } = query;
-    if (title) {
-      options.where.title = { [Op.iLike]: `%${title}%` };
-    }
-
-    const { total_amount_between_1, total_amount_between_2 } = query;
-    if (
-      (total_amount_between_1 || total_amount_between_1 == '0') &&
-      total_amount_between_2
-    ) {
-      options.where.total_amount = {
-        [Op.between]: [total_amount_between_1, total_amount_between_2],
-      };
-    }
-
-    const { total_amount_order } = query;
-    if (total_amount_order) {
-      options.order.push(['total_amount', `${total_amount_order}`]);
-    }
-
-    // This make the Admin Service unique, using soft delete search
-    const { soft_deleted } = query;
-    if (soft_deleted) {
-      options.paranoid = true;
-    }
-
-    const { created_at_order } = query;
-    if (created_at_order) {
-      options.order.push(['created_at', `${created_at_order}`]);
-    }
-
-    options.distinct = true;
-
-    return this.opportunityModel.findAndCountAll(options);
-  }
-
   async addOne(opportunityObject) {
     await this.ifExistByNameThrow409(opportunityObject.title);
 
@@ -151,6 +97,8 @@ export class OpportunitiesService {
     if (opportunityObject.title) {
       await this.ifExistByNameThrow409(opportunityObject.title);
     }
+
+    // If opportunityObject.quantity exist AND user-Opportunities exist --> check if not LOWER thant current value opportunity.quantity
 
     const transaction = await this.sequelize.transaction();
     try {
