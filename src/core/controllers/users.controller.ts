@@ -35,6 +35,10 @@ export class UsersController {
     return await this.usersService.meUser(request.user.id);
   }
 
+  @ApiOperation({
+    summary: 'Returns the Investments Opportunities',
+    description: 'Returns the Inversions Opportunities associated to user',
+  })
   @UseGuards(AuthGuard('jwt-token'))
   @Get('me/investments')
   async myInvestments(
