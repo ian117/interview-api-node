@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Users } from '../models/users.model';
 import { Opportunities } from '../models/opportunities.model';
@@ -104,7 +104,7 @@ export class OpportunitiesService {
       options.order.push(['total_amount', `${total_amount_order}`]);
     }
 
-    // This make Admin Service unique
+    // This make the Admin Service unique, using soft delete search
     const { soft_deleted } = query;
     if (soft_deleted) {
       options.paranoid = true;
@@ -118,5 +118,67 @@ export class OpportunitiesService {
     options.distinct = true;
 
     return this.opportunityModel.findAndCountAll(options);
+  }
+
+  async addOne(opportunityObject) {
+    const transaction = await this.sequelize.transaction();
+    try {
+      const opportunity = await this.opportunityModel.create(
+        opportunityObject,
+        {
+          transaction,
+        },
+      );
+
+      await transaction.commit();
+
+      return opportunity;
+    } catch (error) {
+      transaction.rollback();
+      throw error;
+    }
+  }
+
+  async updateOne(opportunityId, opportunityObject) {
+    const opportunity = await this.findOneOr404(opportunityId);
+
+    const transaction = await this.sequelize.transaction();
+    try {
+      const editedOpportunity = await opportunity.update(opportunityObject, {
+        transaction,
+      });
+
+      await transaction.commit();
+
+      return editedOpportunity;
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
+    }
+  }
+
+  async deleteOne(opportunityId) {
+    const opportunity = await this.findOneOr404(opportunityId);
+
+    const transaction = await this.sequelize.transaction();
+    try {
+      const removedOpportunity = await opportunity.destroy({ transaction });
+
+      await transaction.commit();
+
+      // TODO delete the user-opportunities too
+
+      return removedOpportunity;
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
+    }
+  }
+
+  async findOneOr404(opportunityId) {
+    const opportunity = await this.opportunityModel.findByPk(opportunityId);
+    if (!opportunity)
+      throw new NotFoundException('Not found Inversion Opportunity');
+    return opportunity;
   }
 }
