@@ -36,8 +36,8 @@ export class AuthService {
     return user;
   }
 
-  async userInfoAuth(id): Promise<Users> {
-    const user = await this.findUserByIdOr401(id);
+  async userInfoAuth(email: string): Promise<Users> {
+    const user = await this.findUserByEmailOr401(email);
     delete user.password;
     return user;
   }
@@ -95,9 +95,9 @@ export class AuthService {
     return user;
   }
 
-  private async findUserByIdOr401(id): Promise<Users> {
+  private async findUserByEmailOr401(email): Promise<Users> {
     const user = await this.userModel.findOne({
-      where: { id },
+      where: { email },
       attributes: ['id', 'email', 'password', 'first_name', 'last_name'],
     });
 

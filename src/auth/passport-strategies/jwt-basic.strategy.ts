@@ -18,7 +18,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt-token') {
   }
 
   async validate(payload): Promise<any> {
-    const user = this.authService.userInfoAuth(payload.id);
+    const user = this.authService.userInfoAuth(payload.email);
     return user;
   }
 }
