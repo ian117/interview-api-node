@@ -48,7 +48,7 @@ export class UsersService {
 
     options.include = [
       {
-        model: Users,
+        model: Users.scope('user_balances_view'),
         required: true,
         where: { id },
       },

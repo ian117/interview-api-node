@@ -25,6 +25,9 @@ import { Wallets } from 'src/core/models/wallets.model';
     me_view: {
       attributes: { exclude: ['password'] },
     },
+    user_balances_view: {
+      attributes: ['id', 'email'],
+    },
   },
 })
 export class Users extends Model<Users> {
