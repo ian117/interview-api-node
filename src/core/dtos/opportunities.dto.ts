@@ -2,6 +2,7 @@ import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsIn,
+  IsInt,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -10,9 +11,12 @@ import {
   IsUUID,
   Max,
   MaxLength,
+  Min,
+  ValidateIf,
 } from 'class-validator';
 import { PaginationQueryDTO } from './pagination.dto';
 import { ORDER_OPTIONS } from '../constants/constants';
+import { IsBiggerThan } from './custom-validators.dto';
 
 export class addInvestmentBodyDTO {
   @ApiProperty({
@@ -86,6 +90,31 @@ export class FilterOpportunitiesQueryDto extends PaginationQueryDTO {
   @MaxLength(254)
   @IsOptional()
   readonly title: string;
+
+  @ApiProperty({
+    example: '40000',
+    description: `Search between values for the total amount`,
+    required: false,
+  })
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  @IsOptional()
+  readonly total_amount_between_1: number;
+
+  @ApiProperty({
+    example: '40000',
+    description: `Search between values for the total amount. This value needs to be greater than total_amount_between_1`,
+    required: false,
+  })
+  @Type(() => Number)
+  @IsInt()
+  @IsPositive()
+  @IsOptional()
+  @IsBiggerThan('total_amount_between_1', {
+    message: 'This must be grater than total_amount_between_1',
+  })
+  readonly total_amount_between_2: number;
 
   @ApiProperty({
     example: 'ASC',
