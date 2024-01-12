@@ -102,7 +102,17 @@ export class OpportunitiesService {
       await this.ifExistByNameThrow409(opportunityObject.title);
     }
 
-    // TODO If opportunityObject.quantity exist AND user-Opportunities exist --> check if not LOWER thant current value opportunity.quantity
+    if (opportunityObject.total_amount) {
+      if (opportunityObject.total_amount < opportunity.total_amount) {
+        const investmentsCount =
+          await this.opportunityInvestmentsCount(opportunityId);
+        if (investmentsCount > 0) {
+          throw new ConflictException(
+            'Total amount only can go Up when this Inversion Opportunity have Investments already',
+          );
+        }
+      }
+    }
 
     const transaction = await this.sequelize.transaction();
     try {
@@ -122,7 +132,7 @@ export class OpportunitiesService {
   async deleteOne(opportunityId) {
     const opportunity = await this.findOneOr404(opportunityId);
 
-    // TODO if user-opportunities exist -> throw 409
+    await this.ifOpportunityHaveInvestmentsThrow409(opportunityId);
 
     const transaction = await this.sequelize.transaction();
     try {
@@ -187,6 +197,26 @@ export class OpportunitiesService {
         "User don't have enough founds for this operation. Please provide an amount that the balance in the Wallet can operate with",
       );
     }
+  }
+
+  private async ifOpportunityHaveInvestmentsThrow409(opportunityId) {
+    const investmentsCount = await this.usersOpportunitiesPivotModel.count({
+      where: { opportunity_id: opportunityId },
+      paranoid: false,
+    });
+
+    if (investmentsCount > 0)
+      throw new ConflictException(
+        "Can't remove this Inversion Opportunity because have child records with the User-Opportunities model",
+      );
+  }
+
+  private async opportunityInvestmentsCount(opportunityId) {
+    const investmentsCount = await this.usersOpportunitiesPivotModel.count({
+      where: { opportunity_id: opportunityId },
+    });
+
+    return investmentsCount;
   }
 
   private async restoreOrCreateInvestment(
