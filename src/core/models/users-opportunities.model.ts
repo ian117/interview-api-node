@@ -44,7 +44,7 @@ export class UsersOpportunitiesPivot extends Model<UsersOpportunitiesPivot> {
 
   @DeletedAt
   @Column(DataType.DATE)
-  deleted_at: Date;
+  deleted_at: Date | null;
 
   /* Associations */
 
