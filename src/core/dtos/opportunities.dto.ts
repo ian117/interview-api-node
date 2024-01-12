@@ -10,6 +10,21 @@ import {
   MaxLength,
 } from 'class-validator';
 
+export class addInvestmentBodyDTO {
+  @ApiProperty({
+    example: '1000',
+    description: `Amount to invest`,
+    required: true,
+  })
+  @Type(() => Number)
+  @IsNumber()
+  @IsPositive()
+  @Max(100000000, {
+    message: 'Amount must not be greater than one hundred million',
+  })
+  readonly amount: string;
+}
+
 export class OpportunityParamsDTO {
   @ApiProperty({
     example: 'fd914b72-a423-4256-99a1-aff78da9281f',

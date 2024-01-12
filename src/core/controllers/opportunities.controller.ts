@@ -21,6 +21,7 @@ import {
   CreateOpportunityDTO,
   OpportunityParamsDTO,
   UpdateOpportunityDto,
+  addInvestmentBodyDTO,
 } from '../dtos/opportunities.dto';
 
 @ApiTags('Opportunities')
@@ -100,14 +101,13 @@ export class OpportunitiesController {
   async addInvestment(
     @Req() request: requestUser,
     @Param() { id }: OpportunityParamsDTO,
-    @Body('amount') amount,
+    @Body() { amount }: addInvestmentBodyDTO,
   ) {
     return await this.opportunitiesService.addInvestment(
       request.user.id,
       id,
       amount,
     );
-    // TODO add DTO
   }
 
   @ApiOperation({
