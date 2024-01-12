@@ -154,8 +154,16 @@ export class OpportunitiesService {
     return investment;
   }
 
-  async removeInvestment(id) {
-    // TODO remove investment
+  async deleteInvestment(userId, opportunityId) {
+    const opportunity = await this.findOneOr404(opportunityId);
+
+    const wallet = await this.getUserWallet(userId);
+
+    const investment = await this.removeInvestment(
+      userId,
+      opportunityId,
+      wallet,
+    );
   }
 
   async findOneOr404(opportunityId) {
@@ -205,7 +213,7 @@ export class OpportunitiesService {
             { transaction },
           );
 
-        wallet.balance = wallet.balance - investmentAmount;
+        wallet.balance = Number(wallet.balance) - Number(investmentAmount);
         await wallet.save({ transaction });
 
         await transaction.commit();
@@ -239,6 +247,33 @@ export class OpportunitiesService {
         await transaction.rollback();
         throw error;
       }
+    }
+  }
+
+  private async removeInvestment(userId, opportunityId, wallet: Wallets) {
+    const investmentExist = await this.getInvestmentWithParanoid(
+      userId,
+      opportunityId,
+    );
+
+    if (!investmentExist || investmentExist.deleted_at)
+      throw new NotFoundException(
+        "The user doesn't have investments on this Inversion Opportunity",
+      );
+
+    const transaction = await this.sequelize.transaction();
+    try {
+      wallet.balance =
+        Number(wallet.balance) + Number(investmentExist.investment_amount);
+      await wallet.save({ transaction });
+      investmentExist.investment_amount = 0;
+      await investmentExist.save({ transaction });
+      await investmentExist.destroy({ transaction });
+
+      await transaction.commit();
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
     }
   }
 

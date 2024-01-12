@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   Put,
@@ -10,7 +12,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiNoContentResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { OpportunitiesService } from '../services/opportunities.service';
 import { PaginationQueryDTO } from '../dtos/pagination.dto';
@@ -76,9 +78,10 @@ export class OpportunitiesController {
     description: "Remove one Inversion Opportunity if don't have Inversors",
   })
   @UseGuards(AuthGuard('custom-admin-token'))
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Delete('admin/:id')
   async remove(@Param() { id }: OpportunityParamsDTO) {
-    return await this.opportunitiesService.deleteOne(id);
+    await this.opportunitiesService.deleteOne(id);
   }
 
   @ApiOperation({
@@ -113,9 +116,15 @@ export class OpportunitiesController {
   @ApiOperation({
     summary: 'User drop the Inversion Opportunity',
     description:
-      'Drop the Inversion Opportunity, money is return it to the user and the historial prevails about that record',
+      'Drop the Inversion Opportunity, money is return it to the user and the historial prevails about that record in the DB as a soft delete record (deleted_at field in the model)',
   })
+  @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(AuthGuard('jwt-token'))
   @Delete('investment/:id')
-  async removeInvestment(@Param() { id }: OpportunityParamsDTO) {}
+  async removeInvestment(
+    @Req() request: requestUser,
+    @Param() { id }: OpportunityParamsDTO,
+  ) {
+    await this.opportunitiesService.deleteInvestment(request.user.id, id);
+  }
 }
