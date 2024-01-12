@@ -96,8 +96,19 @@ export class OpportunitiesController {
       'Invest in one Inversion Opportunity, adding a record of User-Opportunity in the pivot table',
   })
   @UseGuards(AuthGuard('jwt-token'))
-  @Post('investment')
-  async addInvestment() {}
+  @Post('investment/:id')
+  async addInvestment(
+    @Req() request: requestUser,
+    @Param() { id }: OpportunityParamsDTO,
+    @Body('amount') amount,
+  ) {
+    return await this.opportunitiesService.addInvestment(
+      request.user.id,
+      id,
+      amount,
+    );
+    // TODO add DTO
+  }
 
   @ApiOperation({
     summary: 'User drop the Inversion Opportunity',
@@ -105,6 +116,6 @@ export class OpportunitiesController {
       'Drop the Inversion Opportunity, money is return it to the user and the historial prevails about that record',
   })
   @UseGuards(AuthGuard('jwt-token'))
-  @Delete('investment')
-  async removeInvestment() {}
+  @Delete('investment/:id')
+  async removeInvestment(@Param() { id }: OpportunityParamsDTO) {}
 }
