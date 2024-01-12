@@ -21,6 +21,7 @@ import { requestUser } from 'src/common/interfaces/common.interface';
 import { AuthGuard } from '@nestjs/passport';
 import {
   CreateOpportunityDTO,
+  FilterOpportunitiesQueryDto,
   OpportunityParamsDTO,
   UpdateOpportunityDto,
   addInvestmentBodyDTO,
@@ -37,7 +38,7 @@ export class OpportunitiesController {
   })
   @UseGuards(AuthGuard(['jwt-token', 'custom-admin-token']))
   @Get()
-  async filter(@Query() query: PaginationQueryDTO) {
+  async filter(@Query() query: FilterOpportunitiesQueryDto) {
     const { page, size } = query;
     const { limit, offset } = getPagination(page, size);
     query.limit = limit;

@@ -31,6 +31,7 @@ export class OpportunitiesService {
   ): Promise<{ rows: Opportunities[]; count: number }> {
     const options: any = {
       where: {},
+      order: [],
     };
 
     const { limit, offset } = query;
@@ -41,7 +42,7 @@ export class OpportunitiesService {
 
     const { id } = query;
     if (id) {
-      options.where.id = { [Op.iLike]: `%${id}%` };
+      options.where.id = id;
     }
 
     const { title } = query;

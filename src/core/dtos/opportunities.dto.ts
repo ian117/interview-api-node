@@ -1,14 +1,18 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
+  IsIn,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsPositive,
   IsString,
   IsUUID,
   Max,
   MaxLength,
 } from 'class-validator';
+import { PaginationQueryDTO } from './pagination.dto';
+import { ORDER_OPTIONS } from '../constants/constants';
 
 export class addInvestmentBodyDTO {
   @ApiProperty({
@@ -38,7 +42,7 @@ export class OpportunityParamsDTO {
 export class CreateOpportunityDTO {
   @ApiProperty({
     example: 'X (Formerly Twitter)',
-    description: `Name of the Inversion Opportunity`,
+    description: `Title of the Inversion Opportunity`,
     required: true,
   })
   @IsString()
@@ -62,3 +66,46 @@ export class CreateOpportunityDTO {
 
 // ALL Keys in CreateDTO now are optionall
 export class UpdateOpportunityDto extends PartialType(CreateOpportunityDTO) {}
+
+export class FilterOpportunitiesQueryDto extends PaginationQueryDTO {
+  @ApiProperty({
+    example: '620fabb9-b1aa-4126-8861-ded4827e6999',
+    description: `UUID of the Inversion Opportunity`,
+    required: false,
+  })
+  @IsUUID('4')
+  @IsOptional()
+  readonly id: string;
+
+  @ApiProperty({
+    example: 'X (Formerly Twitter)',
+    description: `Title of the Inversion Opportunity`,
+    required: false,
+  })
+  @IsString()
+  @MaxLength(254)
+  @IsOptional()
+  readonly title: string;
+
+  @ApiProperty({
+    example: 'ASC',
+    description: `Order for the total amount: ${ORDER_OPTIONS}`,
+    required: false,
+  })
+  @IsString()
+  @MaxLength(254)
+  @IsIn(ORDER_OPTIONS)
+  @IsOptional()
+  readonly total_amount_order: string;
+
+  @ApiProperty({
+    example: 'ASC',
+    description: `Order for the Created At: ${ORDER_OPTIONS}`,
+    required: false,
+  })
+  @IsString()
+  @MaxLength(254)
+  @IsIn(ORDER_OPTIONS)
+  @IsOptional()
+  readonly created_at_order: string;
+}
